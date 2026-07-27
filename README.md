@@ -1,0 +1,40 @@
+# Extending Bertrand's Postulate, and a Puzzle — supplementary material
+
+Verification code accompanying the paper *Extending Bertrand's Postulate,
+and a Puzzle* by Jayanta Manoharmayum and Vamshi Jandhyala.
+
+The paper proves a sharp elementary strengthening of Bertrand's Postulate
+(for every real x ≥ 97 the interval (x/2, x] contains more than √x primes,
+the only exceptions being equality at x = 100 and failure on (100, 101)),
+and uses it to classify the n for which 1, …, n² can be arranged in an
+n × n array whose row products and column products agree as multisets.
+
+## Contents
+
+`verify.py` re-derives every finite computation in the paper from scratch:
+
+| Paper item | Check |
+| --- | --- |
+| Theorem A | swept for all real 97 ≤ x < 1.6 × 10⁶; equality only at x = 100, failure exactly on (100, 101) |
+| Remark 2.4 | the inequality fails exactly on [94, 97) below the threshold |
+| Lemma 2.3 | the finite check for 51 ≤ n ≤ 1057, minimum margin at n = 53, endpoint values |
+| Remark 2.6 | the crossovers for the routes through Ramanujan's bound (n = 2366) and Erdős's bound (t ≥ 1232.02) |
+| Remark 2.7 | R₁ … R₂₀ from Sondow's definition; 4m ln 4m ≤ (m−1)² at m = 21 |
+| Figure 1 | the step-function data for π(x) − π(x/2) on [50, 150] |
+| Figures 2–4 | the balanced arrays for n = 4, …, 8, 10: entries, balance, matched diagonal, lonely primes |
+| Section 3.5 | the censuses: n = 3 (432 arrays, six classes of 72) and n = 4 (2780 classes, 3,202,560 arrays) |
+
+The n = 4 census uses the orthogonal-partition-pair correspondence described
+in the paper and is validated against an independent brute-force enumeration
+of all 9! arrangements for n = 3.
+
+## Running
+
+```
+python3 verify.py
+```
+
+Python 3.8 or later, standard library only. Runtime is a few minutes,
+dominated by the Theorem A sweep and the n = 4 census. Every check prints
+`PASS` or `FAIL`, and the script exits with a non-zero status if any check
+fails.

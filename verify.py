@@ -101,14 +101,29 @@ check(
 # count >= m for all x >= R_m; since the count changes only at integers,
 # R_m = 1 + (largest integer k with count(k) < m).
 # ---------------------------------------------------------------------------
-R = {m: max(k for k in range(1, 5000) if count(k) < m) + 1 for m in range(1, 21)}
+R = {m: max(k for k in range(1, 5000) if count(k) < m) + 1 for m in range(1, 48)}
 check("Ramanujan's list R_1..R_5", [R[m] for m in range(1, 6)] == [2, 11, 17, 29, 41])
 check("R_10 = 97 and R_11 = 101", (R[10], R[11]) == (97, 101))
 check(
     "R_12..R_20 as printed",
     [R[m] for m in range(12, 21)] == [107, 127, 149, 151, 167, 179, 181, 227, 229],
 )
-check("every R_m is prime (m <= 20)", all(sieve[R[m]] for m in R))
+check("every R_m is prime (m <= 47)", all(sieve[R[m]] for m in R))
+
+# Remark "The finite check via Ramanujan primes": R_47 = 599 covers
+# n >= 300 (as 47^2 > 2*1057+2), and the six listed values chain over
+# 51 <= n <= 299 via the windows ceil(R_m/2) <= n <= (m^2-2)//2.
+check(
+    "R_14, R_17, R_25, R_47 as printed",
+    (R[14], R[17], R[25], R[47]) == (149, 179, 269, 599),
+)
+check("R_47 window covers 300..1057", R[47] <= 600 and 47 * 47 > 2 * 1057 + 2)
+covered = set()
+for m in (11, 12, 13, 14, 17, 25):
+    covered.update(range(max((R[m] + 1) // 2, 51), min((m * m - 2) // 2, 299) + 1))
+check(
+    "Ramanujan-prime windows cover 51..299 with no gap", covered >= set(range(51, 300))
+)
 check(
     "4m ln(4m) <= (m-1)^2 at m = 21",
     4 * 21 * math.log(84) < 400,

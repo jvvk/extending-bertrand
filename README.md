@@ -28,10 +28,20 @@ The n = 4 census uses the orthogonal-partition-pair correspondence described
 in the paper and is validated against an independent brute-force enumeration
 of all 9! arrangements for n = 3.
 
+`verify_rectangles.py` verifies the computational inputs of the rectangular
+theorem (no set-balanced m × n array exists for m < n):
+
+| Paper item | Check |
+| --- | --- |
+| Finite check | every pair 2 ≤ m < n with mn ≤ 99 has ℓ(m,n) ≥ m − 1, and the 22-case table of ℓ values |
+| Area boundary | π(100) − π(50) = 10, and every m < n with 100 ≤ mn ≤ 200 has ℓ > m |
+| Corroboration | exhaustive enumeration confirms no set-balanced array for 2×3, 2×4, 2×5, 2×6, 3×4, 3×5 |
+
 ## Running
 
 ```
 python3 verify.py
+python3 verify_rectangles.py
 ```
 
 Python 3.8 or later, standard library only. Runtime is a few minutes,

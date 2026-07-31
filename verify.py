@@ -352,5 +352,75 @@ check(
     f"got {(p4, a4)}",
 )
 
-print(f"\n{len(FAILURES)} failure(s).")
+
+# ---------------------------------------------------------------------------
+# 9. Remark "Repeated products": explicit arrays for n = 4 and n = 6, and
+# the count of repeated-product classes for n = 4.
+# ---------------------------------------------------------------------------
+REP4 = [[11, 9, 1, 4], [2, 13, 15, 12], [3, 8, 14, 10], [6, 5, 16, 7]]
+REP6 = [
+    [19, 13, 15, 5, 30, 22],
+    [26, 23, 34, 21, 28, 1],
+    [25, 17, 29, 27, 4, 16],
+    [10, 14, 9, 31, 36, 12],
+    [33, 24, 8, 6, 2, 35],
+    [3, 7, 20, 32, 11, 18],
+]
+for name, A, k, diag, prods in (
+    ("4x4", REP4, 4, [11, 13], [396, 4680, 3360, 3360]),
+    (
+        "6x6",
+        REP6,
+        6,
+        [19, 23, 29, 31],
+        [12226500, 11955216, 21297600, 16873920, 2661120, 2661120],
+    ),
+):
+    rows = [prod(r) for r in A]
+    cols = [prod(c) for c in zip(*A)]
+    check(
+        f"repeated-product array {name}: entries, matched form, products",
+        sorted(x for r in A for x in r) == list(range(1, k * k + 1))
+        and rows == cols == prods
+        and [A[i][i] for i in range(len(diag))] == diag
+        and prods[-1] == prods[-2],
+    )
+
+rep_classes = 0
+from itertools import combinations as _comb
+
+
+def _parts4():
+    def rec(rem, acc):
+        if not rem:
+            yield tuple(acc)
+            return
+        first, rest = rem[0], rem[1:]
+        for combo in _comb(rest, 3):
+            s = set(combo)
+            acc.append((first,) + combo)
+            yield from rec(tuple(x for x in rest if x not in s), acc)
+            acc.pop()
+
+    yield from rec(tuple(range(1, 17)), [])
+
+
+g9: dict = {}
+for p in _parts4():
+    key = tuple(sorted(prod(b) for b in p))
+    g9.setdefault(key, []).append([set(b) for b in p])
+for key, parts in g9.items():
+    if len(set(key)) == len(key):
+        continue
+    for i in range(len(parts)):
+        for j in range(i + 1, len(parts)):
+            if all(len(r & c) == 1 for r in parts[i] for c in parts[j]):
+                rep_classes += 1
+check(
+    "exactly 4 of the 2780 classes for n = 4 have a repeated product",
+    rep_classes == 4,
+    f"got {rep_classes}",
+)
+
+print(f"\n{len(FAILURES)} failure(s) [extended checks].")
 sys.exit(1 if FAILURES else 0)

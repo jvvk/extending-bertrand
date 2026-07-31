@@ -160,5 +160,13 @@ for m, n in [(2, 3), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5)]:
         count_set_balanced(m, n) == 0,
     )
 
+# -- 4. the scalar reduction of Proposition 3.5 ------------------------------
+# (ell+2)(ell+3) > N for every N <= 96, tightest at N = 40 (42 > 40).
+ell_all = {N: pi[N] - pi[N // 2] for N in range(2, 97)}
+check("(ell+2)(ell+3) > N for every N <= 96",
+      all((e + 2) * (e + 3) > N for N, e in ell_all.items()))
+check("tightest case N = 40 with ell = 4",
+      ell_all[40] == 4 and (ell_all[40] + 2) * (ell_all[40] + 3) == 42)
+
 print(f"\n{len(FAILURES)} failure(s).")
 sys.exit(1 if FAILURES else 0)

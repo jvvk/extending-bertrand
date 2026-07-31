@@ -161,12 +161,30 @@ for m, n in [(2, 3), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5)]:
     )
 
 # -- 4. the scalar reduction of Proposition 3.5 ------------------------------
-# (ell+2)(ell+3) > N for every N <= 96, tightest at N = 40 (42 > 40).
+# (ell+2)(ell+3) > N for every N <= 96, certified in the paper by the table
+# of the largest N attaining each value of ell, with minimum margin 2.
 ell_all = {N: pi[N] - pi[N // 2] for N in range(2, 97)}
-check("(ell+2)(ell+3) > N for every N <= 96",
-      all((e + 2) * (e + 3) > N for N, e in ell_all.items()))
-check("tightest case N = 40 with ell = 4",
-      ell_all[40] == 4 and (ell_all[40] + 2) * (ell_all[40] + 3) == 42)
+check(
+    "(ell+2)(ell+3) > N for every N <= 96",
+    all((e + 2) * (e + 3) > N for N, e in ell_all.items()),
+)
+
+CERTIFICATE = {1: 10, 2: 16, 3: 28, 4: 40, 5: 46, 6: 58, 7: 66, 8: 70, 9: 96, 10: 93}
+nmax: dict = {}
+for N, e in ell_all.items():
+    nmax[e] = max(nmax.get(e, 0), N)
+check(
+    "certificate table: N_max for each ell occurring on 2 <= N <= 96",
+    nmax == CERTIFICATE,
+    str(sorted(nmax.items())),
+)
+
+margins = {N: (e + 2) * (e + 3) - N for N, e in ell_all.items()}
+check(
+    "minimum margin is 2, attained exactly at N = 10, 28, 40",
+    min(margins.values()) == 2
+    and {N for N, m in margins.items() if m == 2} == {10, 28, 40},
+)
 
 print(f"\n{len(FAILURES)} failure(s).")
 sys.exit(1 if FAILURES else 0)

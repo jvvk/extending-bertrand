@@ -1,13 +1,15 @@
-# Extending Bertrand's Postulate, and a Puzzle — supplementary material
+# Balanced squares, impossible rectangles, and Bertrand's Postulate — supplementary material
 
-Verification code accompanying the paper *Extending Bertrand's Postulate,
-and a Puzzle* by Jayanta Manoharmayum and Vamshi Jandhyala.
+Verification code accompanying the paper *Balanced squares, impossible
+rectangles, and Bertrand's Postulate* by Jayanta Manoharmayum and Vamshi
+Jandhyala.
 
 The paper proves a sharp elementary strengthening of Bertrand's Postulate
 (for every real x ≥ 97 the interval (x/2, x] contains more than √x primes,
 the only exceptions being equality at x = 100 and failure on (100, 101)),
-and uses it to classify the n for which 1, …, n² can be arranged in an
-n × n array whose row products and column products agree as multisets.
+and uses it to classify the shapes m × n for which 1, …, mn can be arranged
+in an m × n array whose sets of row and column products agree: only squares
+of order 1, 3–8, and 10.
 
 ## Contents
 
@@ -36,6 +38,7 @@ theorem (no set-balanced m × n array exists for m < n):
 | Finite check | every pair 2 ≤ m < n with mn ≤ 99 has ℓ(m,n) ≥ m − 1, and the 22-case table of ℓ values |
 | Area boundary | π(100) − π(50) = 10, and every m < n with 100 ≤ mn ≤ 200 has ℓ > m |
 | Corroboration | exhaustive enumeration confirms no set-balanced array for 2×3, 2×4, 2×5, 2×6, 3×4, 3×5 |
+| Scalar reduction | (ℓ+2)(ℓ+3) > N for every 2 ≤ N ≤ 96; the certificate table of N_max per ℓ; minimum margin 2 attained exactly at N = 10, 28, 40 |
 
 ## Running
 

@@ -1,21 +1,24 @@
-"""Verification script for the rectangular theorem: no set-balanced m x n
-array exists for m < n (arrangements of 1..mn whose sets of distinct row and
-column products are equal).
+"""Verification script for the rectangular case of Theorem B in "Balanced
+squares, impossible rectangles, and Bertrand's Postulate": no balanced
+m x n array exists for m < n (arrangements of 1..mn whose sets of distinct
+row and column products are equal).
 
-Checks the two computational facts the proof relies on, plus independent
+Checks the computational inputs of the proof, plus independent
 corroboration:
 
-  1. The finite check: for every pair 2 <= m < n with mn <= 99, the lonely
-     prime count ell(m,n) = pi(mn) - pi(mn/2) satisfies ell >= m-1, so every
-     rectangle falls into a rigid case (ell > m: pigeonhole; ell = m: excess
-     column; ell = m-1: product identity).  The table of cases with
-     ell <= m is verified value by value.
-  2. The area boundary: pi(100) - pi(50) = 10, and mn >= 100 with m < n
-     forces ell > m for every divisor pair (checked directly for all such
-     pairs with mn up to 200; beyond that the paper's Theorem A applies).
+  1. A direct check against Lemma 8: for every pair 2 <= m < n with
+     mn <= 99, the lonely prime count ell(m,n) = pi(mn) - pi(mn/2)
+     satisfies ell >= m-1, so Lemma 8 rules out every such shape.
+  2. The area boundary of Proposition 6: pi(100) - pi(50) = 10, and
+     mn >= 100 with m < n forces ell > m for every divisor pair (checked
+     directly for all such pairs with mn up to 200; beyond that the paper's
+     Theorem A applies).
   3. Corroboration: exhaustive enumeration over pairs of orthogonal block
-     partitions confirms that no set-balanced array exists for the six
+     partitions confirms that no balanced array exists for the six
      smallest shapes 2x3, 2x4, 2x5, 2x6, 3x4, 3x5.
+  4. The scalar reduction of Proposition 9: (ell+2)(ell+3) > N for every
+     2 <= N <= 96, the certificate table of N_max per ell, and the minimum
+     margin 2 at N = 10, 28, 40.
 
 Pure standard library (Python 3.8+).  Each check prints PASS or FAIL; the
 script exits non-zero if any check fails.
@@ -53,7 +56,7 @@ def ell(m: int, n: int) -> int:
     return pi[m * n] - pi[m * n // 2]
 
 
-# -- 1. the finite check -----------------------------------------------------
+# -- 1. direct check against Lemma 8 ----------------------------------------
 low = [
     (m, n, ell(m, n))
     for m in range(2, 10)
@@ -62,43 +65,7 @@ low = [
 ]
 check("no pair 2<=m<n, mn<=99 has ell <= m-2", not low, str(low))
 
-TABLE = {
-    (2, 3): 1,
-    (2, 4): 2,
-    (2, 5): 1,
-    (2, 6): 2,
-    (2, 7): 2,
-    (2, 8): 2,
-    (3, 4): 2,
-    (3, 5): 2,
-    (3, 6): 3,
-    (3, 9): 3,
-    (4, 5): 4,
-    (4, 6): 4,
-    (4, 7): 3,
-    (4, 9): 4,
-    (4, 10): 4,
-    (5, 6): 4,
-    (5, 7): 4,
-    (5, 8): 4,
-    (6, 7): 5,
-    (6, 8): 6,
-    (7, 8): 7,
-    (7, 9): 7,
-}
-computed = {
-    (m, n): ell(m, n)
-    for m in range(2, 10)
-    for n in range(m + 1, 51)
-    if m * n <= 99 and ell(m, n) <= m
-}
-check(
-    "table of cases with ell <= m matches the paper",
-    computed == TABLE,
-    f"{len(computed)} cases",
-)
-
-# -- 2. the area boundary ----------------------------------------------------
+# -- 2. the area boundary of Proposition 6 ----------------------------------
 check("pi(100) - pi(50) = 10", pi[100] - pi[50] == 10)
 big = [
     (m, n)
@@ -137,7 +104,7 @@ def partitions(nblocks: int, bsize: int, total: int):
 def count_set_balanced(m: int, n: int) -> int:
     """Count orthogonal pairs (rows: m blocks of n, columns: n blocks of m)
     with equal SETS of distinct block products; each such pair corresponds to
-    a family of set-balanced arrays and vice versa."""
+    a family of balanced arrays and vice versa."""
     cols_by_key: dict = {}
     for cp in partitions(n, m, m * n):
         key = frozenset(prod(b) for b in cp)
@@ -156,11 +123,11 @@ def count_set_balanced(m: int, n: int) -> int:
 
 for m, n in [(2, 3), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5)]:
     check(
-        f"exhaustive enumeration: no set-balanced {m}x{n} array",
+        f"exhaustive enumeration: no balanced {m}x{n} array",
         count_set_balanced(m, n) == 0,
     )
 
-# -- 4. the scalar reduction of Proposition 3.5 ------------------------------
+# -- 4. the scalar reduction of Proposition 9 --------------------------------
 # (ell+2)(ell+3) > N for every N <= 96, certified in the paper by the table
 # of the largest N attaining each value of ell, with minimum margin 2.
 ell_all = {N: pi[N] - pi[N // 2] for N in range(2, 97)}

@@ -1,31 +1,39 @@
-"""Verification script for "Extending Bertrand's Postulate, and a Puzzle"
+"""Verification script for "Balanced squares, impossible rectangles, and
+Bertrand's Postulate"
 by Jayanta Manoharmayum and Vamshi Jandhyala.
 
 Verifies every finite computation in the paper:
 
   1. Theorem A over 97 <= x < 1,600,000, with equality only at x = 100 and
      failure exactly on (100, 101).  The range covers both finite-check
-     routes discussed in Remark 2.6 (x ~ 2116 for the estimate of
-     Proposition 2.2, x ~ 1.518e6 for the route through Erdos's bound).
-  2. The failure window [94, 97) of Remark 2.4.
-  3. The finite check of Lemma 2.3 (51 <= n <= 1057), including the
+     routes discussed in Remark 14 (x ~ 2116 for the estimate of
+     Proposition 2, x ~ 1.518e6 for the route through Erdos's bound).
+  2. The failure window [94, 97) of Remark 4.
+  3. The finite check of Lemma 3 (51 <= n <= 1057), including the
      minimum margin at n = 53 and the endpoint values.
-  4. The Ramanujan primes R_1..R_20 of Remark 2.7, computed from Sondow's
-     definition, and the inequality 4m ln(4m) <= (m-1)^2 at m = 21.
-  5. The crossovers of Remark 2.6 (Ramanujan's bound: n = 2366; Erdos's
+  4. The Ramanujan primes R_1..R_20 of Remark 15, computed from Sondow's
+     definition, the inequality 4m ln(4m) <= (m-1)^2 at m = 21, and the
+     Ramanujan-prime route to the finite check of Remark 16.
+  5. The crossovers of Remark 14 (Ramanujan's bound: n = 2366; Erdos's
      bound: t >= 1232.02).
   6. The step-function data of Figure 1.
-  7. The balanced arrays of Figures 2-4 (n = 4..8 and n = 10), including
+  7. The balanced arrays of Tables 2-4 (n = 4..8 and n = 10), including
      the lonely-prime diagonal for n = 10.
-  8. The censuses of Section 3.5: n = 3 (432 balanced arrays, six classes
-     of 72, with the six listed row-product multisets) and n = 4 (2780
+  8. The censuses of Remark 12: n = 3 (432 balanced arrays, six classes
+     of 72, with their six row-product multisets) and n = 4 (2780
      classes, 3,202,560 arrays).  The n = 4 count uses the
-     orthogonal-partition-pair method described in the paper; the same
+     orthogonal-partition-pair method explained at check 8b; the same
      method is validated against the independent n = 3 brute force.
+  9. The repeated-product arrays of Remark 11 and the count of four such
+     classes for n = 4.
+ 10. The 3 x 3 example of the Introduction, Table 1 (with the values of
+     Proposition 7), Lemma 3 at t = 46, the constant of Corollary 13, the
+     interval endpoints of Remark 16, and the lonely primes lying on the
+     diagonal of every array in Tables 2-4.
 
 Pure standard library (Python 3.8+), no dependencies.  Each check prints
 PASS or FAIL; the script exits non-zero if any check fails.  Total runtime
-is a few minutes, dominated by the Theorem A sweep and the n = 4 census.
+is under a minute, dominated by the Theorem A sweep and the n = 4 census.
 """
 
 from __future__ import annotations
@@ -66,7 +74,7 @@ def count(k: int) -> int:
 
 
 # ---------------------------------------------------------------------------
-# 1-2. Theorem A and the sharpness window of Remark 2.4.
+# 1-2. Theorem A and the sharpness window of Remark 4.
 #
 # On [k, k+1) the count is constant, so the strict inequality
 # count > sqrt(x) throughout [k, k+1) is equivalent to count^2 >= k+1.
@@ -78,15 +86,15 @@ check(
     count(100) == 10 and [k for k in range(97, N) if count(k) ** 2 == k] == [100],
 )
 check(
-    "failure window is exactly [94, 97)",
+    "the last failure interval below 97 is exactly [94, 97)",
     all(count(k) == 9 for k in (94, 95, 96)) and count(93) == 10 == count(97),
 )
 
 # ---------------------------------------------------------------------------
-# 3. Lemma 2.3: pi(2n) - pi(n) > sqrt(2n+2) for 51 <= n <= 1057.
+# 3. Lemma 3: pi(2n) - pi(n) > sqrt(2n+2) for 51 <= n <= 1057.
 # ---------------------------------------------------------------------------
 margins = [(pi[2 * n] - pi[n] - math.sqrt(2 * n + 2), n) for n in range(51, 1058)]
-check("Lemma 2.3 finite check on 51..1057", all(d > 0 for d, _ in margins))
+check("Lemma 3 finite check on 51..1057", all(d > 0 for d, _ in margins))
 check(
     "minimum margin at n = 53",
     min(margins)[1] == 53,
@@ -95,13 +103,25 @@ check(
 check(
     "endpoint values as printed", pi[102] - pi[51] == 11 and pi[2114] - pi[1057] == 142
 )
+# The analytic step for n >= 1058, evaluated at t = 46.
+lhs = math.log(2) / 6 * 46 / math.log(46) - 2 / 46
+rhs = 1 / 3 + math.sqrt(2118) / 46
+check(
+    "Lemma 3 at t = 46: 1.3445... > 1.3338...",
+    f"{lhs:.4f}" == "1.3445" and f"{rhs:.4f}" == "1.3338" and lhs > rhs,
+    f"{lhs:.6f} > {rhs:.6f}",
+)
 
 # ---------------------------------------------------------------------------
-# 4. Ramanujan primes (Remark 2.7).  R_m is the smallest integer such that
+# 4. Ramanujan primes (Remark 15).  R_m is the smallest integer such that
 # count >= m for all x >= R_m; since the count changes only at integers,
-# R_m = 1 + (largest integer k with count(k) < m).
+# R_m = 1 + (largest integer k with count(k) < m).  Scanning k < 5000 is
+# enough for m <= 47: for x >= 2116, put n = floor(x/2) >= 1058; the analytic
+# half of Lemma 3 (which does not use the finite check) gives
+# count(x) >= pi(2n) - pi(n) > sqrt(2n+2) >= sqrt(2118) > 46, so count >= 47.
 # ---------------------------------------------------------------------------
 R = {m: max(k for k in range(1, 5000) if count(k) < m) + 1 for m in range(1, 48)}
+check("every R_m (m <= 47) lies below 2116, inside the scanned range", max(R.values()) < 2116)
 check("Ramanujan's list R_1..R_5", [R[m] for m in range(1, 6)] == [2, 11, 17, 29, 41])
 check("R_10 = 97 and R_11 = 101", (R[10], R[11]) == (97, 101))
 check(
@@ -110,17 +130,33 @@ check(
 )
 check("every R_m is prime (m <= 47)", all(sieve[R[m]] for m in R))
 
-# Remark "The finite check via Ramanujan primes": R_47 = 599 covers
+# Remark 16 (the finite check via Ramanujan primes): R_47 = 599 covers
 # n >= 300 (as 47^2 > 2*1057+2), and the six listed values chain over
-# 51 <= n <= 299 via the windows ceil(R_m/2) <= n <= (m^2-2)//2.
+# 51 <= n <= 299 via the windows ceil(R_m/2) <= n < (m^2-2)/2, that is
+# ceil(R_m/2) <= n <= (m^2-3)//2.
 check(
     "R_14, R_17, R_25, R_47 as printed",
     (R[14], R[17], R[25], R[47]) == (149, 179, 269, 599),
 )
 check("R_47 window covers 300..1057", R[47] <= 600 and 47 * 47 > 2 * 1057 + 2)
+windows = {m: ((R[m] + 1) // 2, (m * m - 3) // 2) for m in (11, 12, 13, 14, 17, 25)}
+check(
+    "Remark 16 intervals as printed",
+    list(windows.values())
+    == [(51, 59), (54, 70), (64, 83), (75, 96), (90, 143), (135, 311)],
+    str(list(windows.values())),
+)
+check(
+    "every n in each window has pi(2n) - pi(n) > sqrt(2n+2)",
+    all(
+        pi[2 * n] - pi[n] >= m and m * m > 2 * n + 2
+        for m, (lo, hi) in windows.items()
+        for n in range(lo, hi + 1)
+    ),
+)
 covered = set()
-for m in (11, 12, 13, 14, 17, 25):
-    covered.update(range(max((R[m] + 1) // 2, 51), min((m * m - 2) // 2, 299) + 1))
+for lo, hi in windows.values():
+    covered.update(range(max(lo, 51), min(hi, 299) + 1))
 check(
     "Ramanujan-prime windows cover 51..299 with no gap", covered >= set(range(51, 300))
 )
@@ -131,7 +167,7 @@ check(
 )
 
 # ---------------------------------------------------------------------------
-# 5. Crossovers of Remark 2.6.
+# 5. Crossovers of Remark 14.
 # ---------------------------------------------------------------------------
 ram = lambda x: (x / 6 - 3 * math.sqrt(x)) / math.log(x)
 check(
@@ -190,7 +226,7 @@ for k in range(51, 151):
 check("Figure 1 step data", recomputed == FIG1)
 
 # ---------------------------------------------------------------------------
-# 7. The balanced arrays of Figures 2-4.
+# 7. The balanced arrays of Tables 2-4.
 # ---------------------------------------------------------------------------
 ARRAYS = {
     4: [[13, 16, 3, 10], [4, 6, 14, 2], [8, 7, 5, 9], [15, 1, 12, 11]],
@@ -255,8 +291,14 @@ for n, A in ARRAYS.items():
     rows = [prod(r) for r in A]
     cols = [prod(c) for c in zip(*A)]
     check(
-        f"Figure array n = {n}: entries 1..n^2, balanced, row_t = col_t",
+        f"Table array n = {n}: entries 1..n^2, balanced, row_t = col_t",
         entries_ok and rows == cols,
+    )
+for n, A in ARRAYS.items():
+    lonely = {p for p in range(n * n // 2 + 1, n * n + 1) if sieve[p]}
+    check(
+        f"Table array n = {n}: all {len(lonely)} lonely primes on the diagonal",
+        all(A[i][j] not in lonely for i in range(n) for j in range(n) if i != j),
     )
 check(
     "n = 10 diagonal is the ten lonely primes",
@@ -279,7 +321,7 @@ check(
     len(balanced3) == 432 and len(msets) == 6 and set(msets.values()) == {72},
 )
 check(
-    "n = 3 row-product multisets as printed",
+    "n = 3 row-product multisets of the six classes",
     sorted(msets)
     == [
         (30, 56, 216),
@@ -293,7 +335,7 @@ check(
 
 
 # ---------------------------------------------------------------------------
-# 8b. Censuses via orthogonal partition pairs (Section 3.5).
+# 8b. Censuses via orthogonal partition pairs (Remark 12).
 #
 # A balanced n x n array corresponds to an ordered pair (R, C) of partitions
 # of {1..n^2} into n blocks of n (row contents, column contents) that are
@@ -354,7 +396,7 @@ check(
 
 
 # ---------------------------------------------------------------------------
-# 9. Remark "Repeated products": explicit arrays for n = 4 and n = 6, and
+# 9. Remark 11 (repeated products): explicit arrays for n = 4 and n = 6, and
 # the count of repeated-product classes for n = 4.
 # ---------------------------------------------------------------------------
 REP4 = [[11, 9, 1, 4], [2, 13, 15, 12], [3, 8, 14, 10], [6, 5, 16, 7]]
@@ -420,6 +462,29 @@ check(
     "exactly 4 of the 2780 classes for n = 4 have a repeated product",
     rep_classes == 4,
     f"got {rep_classes}",
+)
+
+
+# ---------------------------------------------------------------------------
+# 10. The remaining printed values: the 3 x 3 example of the Introduction,
+# Table 1 and Proposition 7, and the constant in Corollary 13.
+# ---------------------------------------------------------------------------
+INTRO = [[5, 2, 3], [1, 7, 8], [6, 4, 9]]
+check(
+    "Introduction 3x3 example: row and column products 30, 56, 216",
+    sorted(x for r in INTRO for x in r) == list(range(1, 10))
+    and [prod(r) for r in INTRO] == [prod(c) for c in zip(*INTRO)] == [30, 56, 216],
+)
+check(
+    "Table 1: ell(n) for n = 1..12",
+    [count(n * n) for n in range(1, 13)] == [0, 1, 2, 2, 4, 4, 6, 7, 10, 10, 13, 14],
+)
+check("Proposition 7: pi(81) = 22, pi(40) = 12", (pi[81], pi[40]) == (22, 12))
+g_prime = lambda t: math.log(2) / 3 * (math.log(t) - 1) / math.log(t) ** 2
+check(
+    "Corollary 13: 2 g'(900) = 0.0579... < 1/10",
+    f"{2 * g_prime(900):.4f}" == "0.0579" and 2 * g_prime(900) < 0.1,
+    f"{2 * g_prime(900):.6f}",
 )
 
 print(f"\n{len(FAILURES)} failure(s) [extended checks].")

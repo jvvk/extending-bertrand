@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Balanced squares, impossible rectangles, and Bertrand's Postulate: supplementary verification code"
+abstract: >-
+  Verification scripts for the paper "Balanced squares, impossible rectangles,
+  and Bertrand's Postulate". They re-derive every finite computation in the
+  paper: the sharp form of Bertrand's Postulate (Theorem A), the Ramanujan-prime
+  route to its finite check, the balanced arrays and censuses, and the
+  computational inputs of the classification of balanced m x n arrays
+  (Theorem B).
+type: software
+authors:
+  - given-names: Jayanta
+    family-names: Manoharmayum
+    affiliation: "School of Mathematics and Physical Sciences, University of Sheffield"
+  - given-names: Vamshi
+    family-names: Jandhyala
+    affiliation: "Independent Researcher"
+    orcid: "https://orcid.org/0009-0006-6708-5805"
+repository-code: "https://github.com/jvvk/extending-bertrand"
+license: MIT
+version: "2.0"
+keywords:
+  - Bertrand's postulate
+  - Ramanujan primes
+  - combinatorial puzzle
